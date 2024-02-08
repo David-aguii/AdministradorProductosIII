@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import "./page.css";
-import { useState } from "react";
+import { div, useState } from "react";
 import { useEffect } from "react";
 export default function Home() {
   const [titulo, setTitulo] = useState("");
@@ -44,7 +44,20 @@ export default function Home() {
       console.log(error);
     }
   };
-
+  const deleteOneProducto = async (productId) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:8000/api/producto/${productId}`
+      );
+      if (response.status === 200) {
+        setProducto((prevProductos) =>
+          prevProductos.filter((producto) => producto._id !== productId)
+        );
+      }
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+    }
+  };
   useEffect(() => {
     getProducto();
   }, []);
@@ -90,9 +103,12 @@ export default function Home() {
         <h1>All Products:</h1>
         {producto.map((item, idx) => {
           return (
-            <a href={`producto/${item._id}/`} key={idx}>
-              {item.titulo}
-            </a>
+            <div className="delete-delist" key={idx}>
+              <a href={`${item._id}`}>{item.titulo}</a>
+              <button onClick={(e) => deleteOneProducto(item._id)}>
+                Delete
+              </button>
+            </div>
           );
         })}
       </div>
